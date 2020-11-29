@@ -211,9 +211,9 @@ namespace Collections.Tasks {
             List<T[]> result = new List<T[]>();
             T[] currentPermutation = new T[count];
 
-            permute(0, 0);
+            combination(0, 0);
 
-            void permute(int counter, int startPos)
+            void combination(int counter, int startPos)
             {
                 int endPos = source.Length - count + counter;
                 for(int i = startPos; i <= endPos; i++)
@@ -224,7 +224,7 @@ namespace Collections.Tasks {
                         result.Add((T[])currentPermutation.Clone());
                         continue;
                     }
-                    permute(counter + 1, i + 1);
+                    combination(counter + 1, i + 1);
                 }
             }
 
