@@ -341,34 +341,26 @@ namespace EnumerableTask {
         ///   { } => { }
         /// </example>
         public IEnumerable<Tuple<string,int>> GetCountOfStrings(IEnumerable<string> data) {
-
-            Dictionary<string, int> dict = new Dictionary<string, int>();
             
-            int nullCount = 0;
-
-            foreach(var item in data)
+            List<string> str = new List<string>();
+            List<int> counters = new List<int>();
+            
+            foreach (var item in data)
             {
-                if(item == null)
+                if (str.Contains(item))
                 {
-                    nullCount++;
+                    counters[str.IndexOf(item)]++;
+                    continue;
                 }
-
-                if(dict.ContainsKey(item))
-                {
-                    dict[item]++;
-                }
-                else
-                {
-                    dict.Add(item, 1);
-                }
+                
+                str.Add(item);
+                counters.Add(1);
             }
 
-            foreach(var item in dict)
+            for (int i = 0; i < counters.Count(); i++)
             {
-                yield return new Tuple<string, int>(item.Key, item.Value);
+                yield return new Tuple<string, int>(str[i], counters[i]);
             }
-
-            yield return new Tuple<string, int>(null, nullCount);
         }
 
         /// <summary> Counts the number of strings with max length in sequence </summary>
@@ -476,15 +468,21 @@ namespace EnumerableTask {
         ///    
         /// </example>
         public IEnumerable<string> GetIEnumerableTypesNames(Assembly assembly) {
-            if(assembly == null)
-            {
+
+            if (assembly == null)
                 throw new ArgumentNullException();
+
+            List<string> result = new List<string>();
+
+            foreach (var type in assembly.GetExportedTypes())
+            {
+                if (type.GetInterface("IEnumerable") != null)
+                {
+                    result.Add(type.Name);
+                }
             }
 
-            foreach(var item in assembly.GetTypes())
-            {
-                yield return item.ToString();
-            }
+            return result.Distinct();
         }
 
         /// <summary>Calculates sales sum by quarter</summary>
@@ -630,8 +628,43 @@ namespace EnumerableTask {
         ///   {"ab","ba","aabb","baba"} => {"a","b"}
         /// </example>
         public IEnumerable<char> GetCommonChars(IEnumerable<string> data) {
-            // TODO : Implement GetCommonChars
-            throw new NotImplementedException();
+
+            
+            if (data.Count() == 0)
+                return string.Empty;
+
+            List<char> result = new List<char>();
+
+            string[] arr = data.OrderBy(a => a.Length).ToArray();
+
+            if (arr[0] == string.Empty)
+                return string.Empty;
+
+            
+            bool contains = true;
+
+            foreach (char item in arr[0])
+            {
+                contains = true;
+
+                for (int i = 1; i < arr.Length; i++)
+                {
+                    if (arr[i].Contains(item))
+                    {
+                        continue;
+                    }
+
+                    contains = false;
+                    break;
+                }
+
+                if (contains)
+                {
+                    result.Add(item);
+                }
+            }
+
+            return result;
         }
 
         /// <summary> Calculates sum of all integers from object array </summary>
@@ -783,8 +816,22 @@ namespace EnumerableTask {
         ///    { } => { }
         /// </example>
         public IEnumerable<int> GetFirstNegativeSubsequence(IEnumerable<int> data) {
-            // TODO : Implement GetFirstNegativeSubsequence
-            throw new NotImplementedException();
+
+            bool isOkay = true;
+            
+            foreach(var digit in data)
+            {
+                if (digit < 0)
+                {
+                    isOkay = false;
+                    yield return digit;
+                }
+
+                if(!isOkay && digit >= 0)
+                {
+                    yield break;
+                }
+            }
         }
 
 
@@ -859,7 +906,8 @@ namespace EnumerableTask {
 
             for (int i = 0; i < vector1.Count(); i++)
             {
-                yield return vector1.ElementAt(i) + vector2.ElementAt(i);            }
+                yield return vector1.ElementAt(i) + vector2.ElementAt(i);
+            }
         }
 
         /// <summary>
@@ -877,8 +925,15 @@ namespace EnumerableTask {
         ///   { 1, 1, 1 } * { 0, 0, 0 } => 1*0 + 1*0 +1*0 = 0
         /// </example>
         public int GetProductOfVectors(IEnumerable<int> vector1, IEnumerable<int> vector2) {
-            // TODO : Implement GetProductOfVectors
-            throw new NotImplementedException();
+
+            int sum = 0;
+
+            for (int i = 0; i < vector1.Count(); i++)
+            {
+                sum += vector1.ElementAt(i) * vector2.ElementAt(i);
+            }
+
+            return sum;
         }
 
 
@@ -897,8 +952,20 @@ namespace EnumerableTask {
         ///  { }, {"Alice"} => { }
         /// </example>
         public IEnumerable<string> GetAllPairs(IEnumerable<string> boys, IEnumerable<string> girls) {
-            // TODO : Implement GetAllPairs
-            throw new NotImplementedException();
+
+            if (boys.Count() == 0 || girls.Count() == 0)
+            {
+                yield break;
+            }
+
+            for (int i = 0; i < boys.Count(); i++)
+            {
+                for(int j = 0; j < girls.Count(); j++)
+                {
+                    //yield return $"{boys.ElementAt(i)}+{boys.ElementAt(j)}";
+                    yield return boys.ElementAt(i) + "+" + girls.ElementAt(j);
+                }
+            }
         }
 
 
@@ -916,8 +983,25 @@ namespace EnumerableTask {
         ///  { } => 0.0
         /// </example>
         public double GetAverageOfDoubleValues(IEnumerable<object> data) {
-            // TODO : Implement GetAverageOfDoubleValues
-            throw new NotImplementedException();
+
+            double sum = 0;
+            int count = 0;
+
+            foreach(var item in data)
+            {
+                if(item is double)
+                {
+                    sum += (double)item;
+                    count++;
+                }
+            }
+
+            if (count != 0)
+            {
+                return sum / count;
+            }
+
+            return 0.0;
         }
 
     }
