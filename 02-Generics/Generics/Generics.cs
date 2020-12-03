@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
+using System.Linq;
 
 namespace Task.Generics
 {
@@ -29,7 +30,7 @@ namespace Task.Generics
 		/// </example>
 		public static string ConvertToString<T>(this IEnumerable<T> list)
 		{
-			return string.Join<T>(ListSeparator.ToString(), list);
+			return string.Join(ListSeparator.ToString(), list);
 		}
 
 		/// <summary>
@@ -148,18 +149,18 @@ namespace Task.Generics
 	/// </example>
 	public static class Singleton<T> where T : new()
 	{
-		private static T instance;
-		private static readonly object locker = new object();
+		private static T _instance;
+		private static readonly object _locker = new object();
 
 		public static T Instance
 		{
 			get
 			{
-				lock (locker)
+				lock (_locker)
 				{
-					if (instance == null)
-						instance = new T();
-					return instance;
+					if (_instance == null)
+						_instance = new T();
+					return _instance;
 				}
 			}
 		}
@@ -244,20 +245,8 @@ namespace Task.Generics
 		/// </example>
 		public static Predicate<T> CombinePredicates<T>(Predicate<T>[] predicates)
 		{
-			return delegate (T item)
-			{
-				foreach (var predicate in predicates)
-				{
-					if (!predicate(item))
-					{
-						return false;
-					}
-				}
-				return true;
-			};
+			return (T item) => predicates.All(predicate => predicate.Invoke(item));
 		}
 
 	}
-
-
 }
