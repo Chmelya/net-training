@@ -60,32 +60,31 @@ namespace Collections.Tasks {
         ///  "TextReader is the abstract base class of StreamReader and StringReader, which ..." => 
         ///   {"TextReader","is","the","abstract","base","class","of","StreamReader","and","StringReader","which",...}
         /// </example>
-        public static IEnumerable<string> Tokenize(TextReader reader) {
+        public static IEnumerable<string> Tokenize(TextReader reader)
+        {
             char[] delimeters = new[] { ',', ' ', '.', '\t', '\n' };
             string str;
-            
-            if(reader == null)
+
+            if (reader == null)
             {
                 throw new ArgumentNullException();
             }
 
-            using(reader)
+            while (true)
             {
-                while (true)
+                str = reader.ReadLine();
+
+                if (str == null)
                 {
-                    str = reader.ReadLine();
+                    break;
+                }
 
-                    if(str == null)
-                    {
-                        break;
-                    }    
-
-                    foreach (var word in str.Split(delimeters, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        yield return word;
-                    }
+                foreach (var word in str.Split(delimeters, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    yield return word;
                 }
             }
+
         }
 
 
@@ -211,9 +210,9 @@ namespace Collections.Tasks {
             List<T[]> result = new List<T[]>();
             T[] currentPermutation = new T[count];
 
-            combination(0, 0);
+            Combination(0, 0);
 
-            void combination(int counter, int startPos)
+            void Combination(int counter, int startPos)
             {
                 int endPos = source.Length - count + counter;
                 for(int i = startPos; i <= endPos; i++)
@@ -224,7 +223,7 @@ namespace Collections.Tasks {
                         result.Add((T[])currentPermutation.Clone());
                         continue;
                     }
-                    combination(counter + 1, i + 1);
+                    Combination(counter + 1, i + 1);
                 }
             }
 
