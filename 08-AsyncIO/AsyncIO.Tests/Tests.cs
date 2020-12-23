@@ -11,8 +11,8 @@ namespace AsyncIO.Tests
     public class Tests
     {
         private string[] sites = { 
-           "google", "msdn",  "facebook", "linkedin", "twitter",
-           "bing",   "yahoo", "youtube",  "baidu",    "amazon"
+           "google", "linkedin", "epam", "vk", "apple",
+           "bing",  "youtube",  "baidu", "twitch", "docs.microsoft"
         };
 
 
@@ -125,7 +125,7 @@ namespace AsyncIO.Tests
         {
             UnitTestsTraceListener.IsActive = true;
             try {
-                const string uri = "http://www.msdn.com/";
+                const string uri = "http://www.docs.microsoft.com/";
                 
                 action(new Uri(uri));
 
