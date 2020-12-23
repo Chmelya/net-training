@@ -42,7 +42,7 @@ namespace AsyncIO
             {
                 if(tasks.Where(task => task != null).Count() >= maxConcurrentStreams)
                 {
-                    Task.WaitAll(tasks.Where(task => task != null).ToArray());
+                    Task.WaitAny(tasks.Where(task => task != null).ToArray());
                 }
                 
                 tasks.Add(new WebClient().DownloadStringTaskAsync(uri));
