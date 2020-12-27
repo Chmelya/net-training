@@ -10,9 +10,12 @@ namespace AsyncIO.Tests
     [TestClass]
     public class Tests
     {
-        private string[] sites = { 
-           "google", "linkedin", "epam", "vk", "apple",
-           "bing",  "youtube",  "baidu", "twitch", "docs.microsoft"
+        private string[] sites = {
+           "baidu", "baidu", "baidu",
+           "baidu", "baidu", "baidu",
+           "baidu", "baidu", "baidu",
+           "baidu", "baidu", "baidu",
+           "baidu", "baidu", "baidu",
         };
 
 
@@ -88,8 +91,8 @@ namespace AsyncIO.Tests
         [TestCategory("GetUrlMD5")]
         public void GetUrlMD5_Should_Return_CorrectValue()
         {
-            var actual = new Uri(@"ftp://ftp.byfly.by/test/100kb.txt").GetMD5Async().Result;
-            Assert.AreEqual("869c2d2bacc13741416c6303a3a92282", actual, true);
+            var actual = new Uri(@"file:///D:\Downloads\Rikhter_Dzh_CLR_via_C__4-E_Izdanie_2013.pdf").GetMD5Async().Result;
+            Assert.AreEqual("c4df6ff3b0729ea6f3e7b5ce8d9e628e", actual, true);
         }
 
 
@@ -125,8 +128,8 @@ namespace AsyncIO.Tests
         {
             UnitTestsTraceListener.IsActive = true;
             try {
-                const string uri = "http://www.docs.microsoft.com/";
-                
+                const string uri = "http://docs.microsoft.com/";
+
                 action(new Uri(uri));
 
                 var actual = UnitTestsTraceListener.GetRequest(uri);
