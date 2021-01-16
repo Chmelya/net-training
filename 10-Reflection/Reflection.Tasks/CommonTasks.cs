@@ -20,7 +20,6 @@ namespace Reflection.Tasks
             return Assembly
                 .Load(assemblyName)
                 .ExportedTypes
-                .ToList()
                 .Where(t => t.IsClass && t.IsPublic && t.GetCustomAttributes(typeof(ObsoleteAttribute)).Any())
                 .Select(t => t.Name);
         }

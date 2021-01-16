@@ -34,33 +34,25 @@ namespace Reflection.Tasks
 
             BlockExpression block = Expression.Block
                 (
-                    //variables
-                    new[] { result, index }
-
-                    //body
-                    , Expression.Assign(index, Expression.Constant(0))
-                    , Expression.Loop
+                    new[] { result, index }, 
+                    
+                    Expression.Assign(index, Expression.Constant(0)),
+                    Expression.Loop
                     (
                         Expression.IfThenElse
                         (
-                            //condition
-                            Expression.LessThan(index, Expression.ArrayLength(firstVector))
-
-                            //if true
-                            , Expression.AddAssign(
-                                  result
-                                , Expression.Multiply(
-                                      Expression.ArrayAccess(firstVector, index)
-                                    , Expression.ArrayAccess(secondVector, Expression.PostIncrementAssign(index))
+                            Expression.LessThan(index, Expression.ArrayLength(firstVector)),
+                            
+                            Expression.AddAssign(
+                                  result,
+                                  Expression.Multiply(
+                                      Expression.ArrayAccess(firstVector, index),
+                                      Expression.ArrayAccess(secondVector, Expression.PostIncrementAssign(index))
                                 )
-                            )
-
-                            //if flase
-                            , Expression.Break(label, result)
-                        )
-
-                        //return
-                        , label
+                            ),
+                            Expression.Break(label, result)
+                        ),
+                        label
                     )
                 );
 
