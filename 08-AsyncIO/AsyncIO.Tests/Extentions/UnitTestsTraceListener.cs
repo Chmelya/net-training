@@ -34,6 +34,7 @@ namespace AsyncIO.Tests.Extentions
         {
             if (Filter != null && !Filter.ShouldTrace(eventCache, source, eventType, id, message, null, null, null))
                 return;
+
             TraceEventCore(eventCache, source, eventType, id, message);
         }
 
@@ -87,20 +88,21 @@ namespace AsyncIO.Tests.Extentions
             return this == obj;
         }
 
-        public sealed override object InitializeLifetimeService()              { return base.InitializeLifetimeService(); }
-        public sealed override string ToString()                               { return base.ToString(); }
+        public sealed override object InitializeLifetimeService() { return base.InitializeLifetimeService(); }
+        public sealed override string ToString() { return base.ToString(); }
         public sealed override System.Runtime.Remoting.ObjRef CreateObjRef(Type requestedType) { return base.CreateObjRef(requestedType); }
-        public sealed override void Write(object o)                            { base.Write(o); }
-        public sealed override void Write(object o, string category)           { base.Write(o, category); }
-        public sealed override void Write(string message, string category)     { base.Write(message, category); }
-        protected sealed override void WriteIndent()                           { base.WriteIndent(); }
-        public sealed override void WriteLine(object o)                        { base.WriteLine(o); }
-        public sealed override void WriteLine(object o, string category)       { base.WriteLine(o, category); }
+        public sealed override void Write(object o) { base.Write(o); }
+        public sealed override void Write(object o, string category) { base.Write(o, category); }
+        public sealed override void Write(string message, string category) { base.Write(message, category); }
+        protected sealed override void WriteIndent() { base.WriteIndent(); }
+        public sealed override void WriteLine(object o) { base.WriteLine(o); }
+        public sealed override void WriteLine(object o, string category) { base.WriteLine(o, category); }
         public sealed override void WriteLine(string message, string category) { base.WriteLine(message, category); }
-        public sealed override void Fail(string message)                       { base.Fail(message); }
+        public sealed override void Fail(string message) { base.Fail(message); }
         public sealed override void Fail(string message, string detailMessage) { base.Fail(message, detailMessage); }
 
-        public sealed override void Close() {
+        public sealed override void Close()
+        {
             Dispose(true);
         }
         #endregion
@@ -113,41 +115,41 @@ namespace AsyncIO.Tests.Extentions
     public class UnitTestsTraceListener : TraceListener2
     {
 
-        private static readonly Dictionary<Regex, Action<Match>> stateMachine = new Dictionary<Regex, Action<Match>> { 
-            { 
-                new Regex(@"\[(?<tid>\d+)\] HttpWebRequest\#(?<id>\d+)\:\:HttpWebRequest\((?<url>\S+)\#(-?)(\d+)\)"),
+        private static readonly Dictionary<Regex, Action<Match>> stateMachine = new Dictionary<Regex, Action<Match>> {
+            {
+                new Regex(@"\[(?<tid>\d+)\] Entering HttpWebRequest\#(?<id>\d+)\:\:HttpWebRequest\((?<url>\S+)\#(-?)(\d+)\)"),
                 m => GetHttpRequest(m.IntValue("id")).Url = m.StringValue("url")
             },
-            { 
+            {
                 new Regex(@"\[(?<tid>\d+)\] Associating HttpWebRequest\#(?<id>\d+) with ConnectStream\#(?<cid>\d+)"),
                 m => AddHttpStream(m.IntValue("id"), m.IntValue("cid"))
             },
-            { 
-                new Regex(@"\[(?<tid>\d+)\] HttpWebRequest\#(?<id>\d+)\:\:BeginGetResponse\(\)"),
+            {
+                new Regex(@"\[(?<tid>\d+)\] Entering HttpWebRequest\#(?<id>\d+)\:\:BeginGetResponse\(\)"),
                 m => GetHttpRequest(m.IntValue("id")).IsAsync = true
             },
-            { 
-                new Regex(@"\[(?<tid>\d+)\] HttpWebRequest\#(?<id>\d+)\:\:GetResponse\(\)"),
+            {
+                new Regex(@"\[(?<tid>\d+)\] Entering HttpWebRequest\#(?<id>\d+)\:\:GetResponse\(\)"),
                 m => GetHttpRequest(m.IntValue("id")).IsAsync = false
             },
-            { 
-                new Regex(@"\[(?<tid>\d+)\] ConnectStream\#(?<cid>\d+)\:\:BeginRead\(\)"),
+            {
+                new Regex(@"\[(?<tid>\d+)\] Entering ConnectStream\#(?<cid>\d+)\:\:BeginRead\(\)"),
                 m => GetHttpStream(m.IntValue("cid")).IsAsync = true
             },
-            { 
-                new Regex(@"\[(?<tid>\d+)\] ConnectStream\#(?<cid>\d+)\:\:Read\(\)"),
+            {
+                new Regex(@"\[(?<tid>\d+)\] Entering ConnectStream\#(?<cid>\d+)\:\:Read\(\)"),
                 m => GetHttpStream(m.IntValue("cid")).IsAsync = false
             },
-            { 
-                new Regex(@"\[(?<tid>\d+)\] ConnectStream\#(?<cid>\d+) - Sending headers"),
+            {
+                new Regex(@"\[(?<tid>\d+)\] ConnectStream\#(?<cid>\d+) - Отправка заголовков"),
                 m => StreamClosed(m.IntValue("cid"))
             },
-            { 
-                new Regex(@"\[(?<tid>\d+)\] ConnectStream\#(?<cid>\d+)\:\:Close\(\)"),
+            {
+                new Regex(@"\[(?<tid>\d+)\] Entering ConnectStream\#(?<cid>\d+)\:\:Close\(\)"),
                 m => StreamClosed(m.IntValue("cid"))
             },
-            { 
-                new Regex(@"\[(?<tid>\d+)\] HttpWebRequest\#(?<id>\d+)\:\:\(\) - Error code"),
+            {
+                new Regex(@"\[(?<tid>\d+)\] HttpWebRequest\#(?<id>\d+)\:\:\(\) - Код ошибки"),
                 m => CloseAllStreams(m.IntValue("id"))
             }
 
@@ -186,11 +188,11 @@ namespace AsyncIO.Tests.Extentions
 
         private static void AddHttpStream(int id, int streamId)
         {
-            var result = streamIndex.GetOrAdd(streamId, 
-                (x) => { 
-                         StreamsCountChanged(+1); 
-                         return new StreamDetail() {Id = streamId, IsClosed = false};
-                        });
+            var result = streamIndex.GetOrAdd(streamId,
+                (x) => {
+                    StreamsCountChanged(+1);
+                    return new StreamDetail() { Id = streamId, IsClosed = false };
+                });
 
             var request = GetHttpRequest(id);
             request.Streams.Add(result);
@@ -201,7 +203,7 @@ namespace AsyncIO.Tests.Extentions
             var request = GetHttpRequest(id);
             lock (lockObject)
             {
-                foreach (var stream in request.Streams.Where(x=>!x.IsClosed))
+                foreach (var stream in request.Streams.Where(x => !x.IsClosed))
                 {
                     stream.IsClosed = true;
                     concurrentStreamsCount--;
@@ -260,7 +262,8 @@ namespace AsyncIO.Tests.Extentions
         public bool? IsAsync { get; set; }
         public List<StreamDetail> Streams { get; set; }
 
-        public bool IsStreamAsync {
+        public bool IsStreamAsync
+        {
             get { return Streams.All(x => x.IsAsync != false); }
         }
     }
@@ -285,4 +288,4 @@ namespace AsyncIO.Tests.Extentions
         }
     }
 
-}
+} 
