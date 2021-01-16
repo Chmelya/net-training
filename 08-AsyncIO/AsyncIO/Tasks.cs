@@ -36,6 +36,11 @@ namespace AsyncIO
         /// <returns>The sequence of downloaded url content</returns>
         public static IEnumerable<string> GetUrlContentAsync(this IEnumerable<Uri> uris, int maxConcurrentStreams)
         {
+            return Helper(uris, maxConcurrentStreams).GetAwaiter().GetResult();
+        }
+
+        public static async Task<IEnumerable<string>> Helper(this IEnumerable<Uri> uris, int maxConcurrentStreams)
+        {
             List<Task<string>> tasks = new List<Task<string>>(maxConcurrentStreams);
             Stack<Uri> stack = new Stack<Uri>(uris);
 
@@ -48,7 +53,7 @@ namespace AsyncIO
             while (tasks.Count > 0)
             {
                 var fineshedTask = Task.WhenAny(tasks);
-                tasks.Remove(fineshedTask.Result);
+                tasks.Remove(await fineshedTask);
 
                 if (stack.Count > 0)
                 {
@@ -59,16 +64,15 @@ namespace AsyncIO
             return tasks.Select(task => task.Result);
         }
 
-
-        /// <summary>
-        /// Calculates MD5 hash of required resource.
-        /// 
-        /// Method has to run asynchronous. 
-        /// Resource can be any of type: http page, ftp file or local file.
-        /// </summary>
-        /// <param name="resource">Uri of resource</param>
-        /// <returns>MD5 hash</returns>
-        public static async Task<string> GetMD5Async(this Uri resource)
+            /// <summary>
+            /// Calculates MD5 hash of required resource.
+            /// 
+            /// Method has to run asynchronous. 
+            /// Resource can be any of type: http page, ftp file or local file.
+            /// </summary>
+            /// <param name="resource">Uri of resource</param>
+            /// <returns>MD5 hash</returns>
+            public static async Task<string> GetMD5Async(this Uri resource)
         {
             return BitConverter.ToString(MD5.Create().ComputeHash(
                 await new WebClient().DownloadDataTaskAsync(resource)))
